@@ -1,0 +1,13 @@
+*.user
+*.suo
+/_ReSharper.*
+/TestResults
+bin
+obj
+Debug
+Release
+Express
+*.Cache
+TestResult.xml
+*.VisualState.xml
+*.vsmdi

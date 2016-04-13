@@ -1,58 +1,48 @@
-using System;
-using SolidWorks.Interop.sldworks;
-using SolidWorks.Interop.swpublished;
-using SolidWorks.Interop.swconst;
 
 namespace SavePDF
 {
+
+    using System;
+    using SolidWorks.Interop.sldworks;
+    using SolidWorks.Interop.swconst;
+
+    /// <summary>
+    /// The user pm page.
+    /// </summary>
     public class UserPMPage
     {
-        //Local Objects
-        IPropertyManagerPage2 swPropertyPage = null;
-        PMPHandler handler = null;
-        ISldWorks iSwApp = null;
-        SwAddin userAddin = null;
+        // Local Objects
+        private IPropertyManagerPage2 swPropertyPage;
+        private PMPHandler handler;
+        private readonly ISldWorks iSwApp;
+        private readonly SwAddin userAddin;
 
         #region Property Manager Page Controls
         //Groups
-        IPropertyManagerPageGroup group1;
-        IPropertyManagerPageGroup group2;
+        IPropertyManagerPageGroup SavePDFGroup;
 
         //Controls
-        IPropertyManagerPageTextbox textbox1;
-        IPropertyManagerPageCheckbox checkbox1;
-        IPropertyManagerPageOption option1;
-        IPropertyManagerPageOption option2;
-        IPropertyManagerPageOption option3;
-        IPropertyManagerPageListbox list1;
-
-        IPropertyManagerPageSelectionbox selection1;
-        IPropertyManagerPageNumberbox num1;
-        IPropertyManagerPageCombobox combo1;
+        IPropertyManagerPageTextbox LocationTextbox;
+        IPropertyManagerPageCheckbox revisionCheckbox;
+        IPropertyManagerPageCheckbox descriptionCheckbox;
+        IPropertyManagerPageCheckbox showCheckbox;
 
         //Control IDs
         public const int group1ID = 0;
-        public const int group2ID = 1;
 
-        public const int textbox1ID = 2;
-        public const int checkbox1ID = 3;
-        public const int option1ID = 4;
-        public const int option2ID = 5;
-        public const int option3ID = 6;
-        public const int list1ID = 7;
-
-        public const int selection1ID = 8;
-        public const int num1ID = 9;
-        public const int combo1ID = 10;
+        public const int LocationTextboxId = 1;
+        public const int RevisionCheckboxId = 2;
+        public const int DescriptionCheckboxId = 3;
+        public const int ShowCheckboxId = 4;
         #endregion
 
         public UserPMPage(SwAddin addin)
         {
             this.userAddin = addin;
-            if (userAddin != null)
+            if (this.userAddin != null)
             {
-                iSwApp = (ISldWorks)userAddin.SwApp;
-                CreatePropertyManagerPage();
+                this.iSwApp = this.userAddin.SwApp;
+                this.CreatePropertyManagerPage();
             }
             else
             {
@@ -64,27 +54,27 @@ namespace SavePDF
         protected void CreatePropertyManagerPage()
         {
             int errors = -1;
-            int options = (int)swPropertyManagerPageOptions_e.swPropertyManagerOptions_OkayButton |
-                (int)swPropertyManagerPageOptions_e.swPropertyManagerOptions_CancelButton;
+            const int Options = (int)swPropertyManagerPageOptions_e.swPropertyManagerOptions_OkayButton |
+                                (int)swPropertyManagerPageOptions_e.swPropertyManagerOptions_CancelButton;
 
-            handler = new PMPHandler(userAddin);
-            swPropertyPage = (IPropertyManagerPage2)iSwApp.CreatePropertyManagerPage("Sample PMP", options, handler, ref errors);
-            if (swPropertyPage != null && errors == (int)swPropertyManagerPageStatus_e.swPropertyManagerPage_Okay)
+            this.handler = new PMPHandler(this.userAddin);
+            this.swPropertyPage = (IPropertyManagerPage2)iSwApp.CreatePropertyManagerPage("Save PDF", Options, this.handler, ref errors);
+            if (this.swPropertyPage != null && errors == (int)swPropertyManagerPageStatus_e.swPropertyManagerPage_Okay)
             {
                 try
                 {
-                    AddControls();
+                    this.AddControls();
                 }
                 catch (Exception e)
                 {
-                    iSwApp.SendMsgToUser2(e.Message, 0, 0);
+                    this.iSwApp.SendMsgToUser2(e.Message, 0, 0);
                 }
             }
         }
 
 
-        //Controls are displayed on the page top to bottom in the order 
-        //in which they are added to the object.
+        // Controls are displayed on the page top to bottom in the order 
+        // in which they are added to the object.
         protected void AddControls()
         {
             short controlType = -1;
@@ -92,122 +82,56 @@ namespace SavePDF
             int options = -1;
 
 
-            //Add the groups
+            // Add the groups
             options = (int)swAddGroupBoxOptions_e.swGroupBoxOptions_Expanded |
                       (int)swAddGroupBoxOptions_e.swGroupBoxOptions_Visible;
 
-            group1 = (IPropertyManagerPageGroup)swPropertyPage.AddGroupBox(group1ID, "Sample Group 1", options);
+            this.SavePDFGroup = (IPropertyManagerPageGroup)this.swPropertyPage.AddGroupBox(group1ID, "Save PDF", options);
 
-            options = (int)swAddGroupBoxOptions_e.swGroupBoxOptions_Checkbox |
-                      (int)swAddGroupBoxOptions_e.swGroupBoxOptions_Visible;
+            // Add the controls to group1
 
-            group2 = (IPropertyManagerPageGroup)swPropertyPage.AddGroupBox(group2ID, "Sample Group 2", options);
-
-            //Add the controls to group1
-
-            //textbox1
+            // LocationTextbox
             controlType = (int)swPropertyManagerPageControlType_e.swControlType_Textbox;
             align = (int)swPropertyManagerPageControlLeftAlign_e.swControlAlign_LeftEdge;
             options = (int)swAddControlOptions_e.swControlOptions_Enabled |
                       (int)swAddControlOptions_e.swControlOptions_Visible;
 
-            textbox1 = (IPropertyManagerPageTextbox)group1.AddControl(textbox1ID, controlType, "Type Here", align, options, "This is an example textbox");
+            this.LocationTextbox = (IPropertyManagerPageTextbox)SavePDFGroup.AddControl(LocationTextboxId, controlType, "PDF Location", align, options, "The File location where the PDFs will be saved to.");
 
-            //checkbox1
+            // Rev Checkbox
             controlType = (int)swPropertyManagerPageControlType_e.swControlType_Checkbox;
             align = (int)swPropertyManagerPageControlLeftAlign_e.swControlAlign_LeftEdge;
             options = (int)swAddControlOptions_e.swControlOptions_Enabled |
                       (int)swAddControlOptions_e.swControlOptions_Visible;
 
-            checkbox1 = (IPropertyManagerPageCheckbox)group1.AddControl(checkbox1ID, controlType, "Sample Checkbox", align, options, "This is a sample checkbox");
-
-            //option1
-            controlType = (int)swPropertyManagerPageControlType_e.swControlType_Option;
+            this.revisionCheckbox = (IPropertyManagerPageCheckbox)SavePDFGroup.AddControl(RevisionCheckboxId, controlType, "Append Revision", align, options, "Append the Revision to the filename");
+            
+            // Description Checkbox
+            controlType = (int)swPropertyManagerPageControlType_e.swControlType_Checkbox;
             align = (int)swPropertyManagerPageControlLeftAlign_e.swControlAlign_LeftEdge;
             options = (int)swAddControlOptions_e.swControlOptions_Enabled |
                       (int)swAddControlOptions_e.swControlOptions_Visible;
 
-            option1 = (IPropertyManagerPageOption)group1.AddControl(option1ID, controlType, "Option1", align, options, "Radio Buttons");
+            this.descriptionCheckbox = (IPropertyManagerPageCheckbox)SavePDFGroup.AddControl(DescriptionCheckboxId, controlType, "Append Description", align, options, "Append the Description to the filename");
 
-            //option2
-            controlType = (int)swPropertyManagerPageControlType_e.swControlType_Option;
+            // Show Checkbox
+            controlType = (int)swPropertyManagerPageControlType_e.swControlType_Checkbox;
             align = (int)swPropertyManagerPageControlLeftAlign_e.swControlAlign_LeftEdge;
             options = (int)swAddControlOptions_e.swControlOptions_Enabled |
                       (int)swAddControlOptions_e.swControlOptions_Visible;
 
-            option2 = (IPropertyManagerPageOption)group1.AddControl(option2ID, controlType, "Option2", align, options, "Radio Buttons");
-
-            //option3
-            controlType = (int)swPropertyManagerPageControlType_e.swControlType_Option;
-            align = (int)swPropertyManagerPageControlLeftAlign_e.swControlAlign_LeftEdge;
-            options = (int)swAddControlOptions_e.swControlOptions_Enabled |
-                      (int)swAddControlOptions_e.swControlOptions_Visible;
-
-            option3 = (IPropertyManagerPageOption)group1.AddControl(option3ID, controlType, "Option3", align, options, "Radio Buttons");
-
-            //list1
-            controlType = (int)swPropertyManagerPageControlType_e.swControlType_Listbox;
-            align = (int)swPropertyManagerPageControlLeftAlign_e.swControlAlign_LeftEdge;
-            options = (int)swAddControlOptions_e.swControlOptions_Enabled |
-                      (int)swAddControlOptions_e.swControlOptions_Visible;
-
-            list1 = (IPropertyManagerPageListbox)group1.AddControl(list1ID, controlType, "Sample Listbox", align, options, "List of selectable items");
-            if (list1 != null)
-            {
-                string[] items = { "One Fish", "Two Fish", "Red Fish", "Blue Fish" };
-                list1.Height = 50;
-                list1.AddItems(items);
-            }
-
-            //Add controls to group2
-            //selection1
-            controlType = (int)swPropertyManagerPageControlType_e.swControlType_Selectionbox;
-            align = (int)swPropertyManagerPageControlLeftAlign_e.swControlAlign_LeftEdge;
-            options = (int)swAddControlOptions_e.swControlOptions_Enabled |
-                      (int)swAddControlOptions_e.swControlOptions_Visible;
-
-            selection1 = (IPropertyManagerPageSelectionbox)group2.AddControl(selection1ID, controlType, "Sample Selection", align, options, "Displays features selected in main view");
-            if (selection1 != null)
-            {
-                int[] filter = { (int)swSelectType_e.swSelEDGES, (int)swSelectType_e.swSelVERTICES };
-                selection1.Height = 40;
-                selection1.SetSelectionFilters(filter);
-            }
-
-            //num1
-            controlType = (int)swPropertyManagerPageControlType_e.swControlType_Numberbox;
-            align = (int)swPropertyManagerPageControlLeftAlign_e.swControlAlign_LeftEdge;
-            options = (int)swAddControlOptions_e.swControlOptions_Enabled |
-                      (int)swAddControlOptions_e.swControlOptions_Visible;
-
-            num1 = (IPropertyManagerPageNumberbox)group2.AddControl(num1ID, controlType, "Sample Numberbox", align, options, "Allows for numerical input");
-            if (num1 != null)
-            {
-                num1.Value = 50.0;
-                num1.SetRange((int)swNumberboxUnitType_e.swNumberBox_UnitlessDouble, 0.0, 100.0, 0.01, true);
-            }
-
-            //combo1
-            controlType = (int)swPropertyManagerPageControlType_e.swControlType_Combobox;
-            align = (int)swPropertyManagerPageControlLeftAlign_e.swControlAlign_LeftEdge;
-            options = (int)swAddControlOptions_e.swControlOptions_Enabled |
-                      (int)swAddControlOptions_e.swControlOptions_Visible;
-
-            combo1 = (IPropertyManagerPageCombobox)group2.AddControl(combo1ID, controlType, "Sample Combobox", align, options, "Combo list");
-            if (combo1 != null)
-            {
-                string[] items = { "One Fish", "Two Fish", "Red Fish", "Blue Fish" };
-                combo1.AddItems(items);
-                combo1.Height = 50;
-
-            }
+            this.showCheckbox = (IPropertyManagerPageCheckbox)SavePDFGroup.AddControl(ShowCheckboxId, controlType, "Show PDF", align, options, "Show the PDF after saving");
         }
 
         public void Show()
         {
-            if (swPropertyPage != null)
+            if (this.swPropertyPage != null)
             {
-                swPropertyPage.Show();
+                this.LocationTextbox.Text = this.userAddin.PDFLocation;
+                this.revisionCheckbox.Checked = this.userAddin.AppendRevision;
+                this.descriptionCheckbox.Checked = this.userAddin.AppendDescription;
+                this.showCheckbox.Checked = this.userAddin.ShowPDF;
+                this.swPropertyPage.Show();
             }
         }
     }

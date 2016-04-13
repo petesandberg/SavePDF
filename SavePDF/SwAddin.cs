@@ -8,12 +8,16 @@ namespace SavePDF
     using System.Collections;
     using System.Reflection;
 
+    using Microsoft.Win32;
+
     using SolidWorks.Interop.sldworks;
     using SolidWorks.Interop.swpublished;
     using SolidWorks.Interop.swconst;
     using SolidWorksTools;
     using SolidWorksTools.File;
     using System.Collections.Generic;
+
+    using Environment = System.Environment;
 
     /// <summary>
     /// Saves a PDF copy of a drawing.
@@ -31,11 +35,19 @@ namespace SavePDF
         int addinID = 0;
         BitmapHandler iBmp;
 
-        public const int MainCmdGroupID = 5;
+        public const int MainCmdGroupID = 1;
         public const int MainItemID1 = 0;
-        public const int MainItemID2 = 1;
-        public const int MainItemID3 = 2;
-        public const int FlyoutGroupID = 91;
+
+        private const string OptionsKeyName = "Software\\Airgas Inc\\SavePDF";
+        private const string LocationValueName = "PDFLocation";
+        private const string RevisionValueName = "AppendRevision";
+        private const string DescriptionValueName = "AppendDescription";
+        private const string ShowPDFValueName = "ShowPDF";
+
+        public string PDFLocation { get; set; }
+        public bool AppendRevision { get; set; }
+        public bool AppendDescription { get; set; }
+        public bool ShowPDF { get; set; }
 
         #region Event Handler Variables
         Hashtable openDocs = new Hashtable();
@@ -98,6 +110,7 @@ namespace SavePDF
                 keyname = "Software\\SolidWorks\\AddInsStartup\\{" + t.GUID.ToString() + "}";
                 addinkey = hkcu.CreateSubKey(keyname);
                 addinkey.SetValue(null, Convert.ToInt32(SWattr.LoadAtStartup), Microsoft.Win32.RegistryValueKind.DWord);
+
             }
             catch (NullReferenceException nl)
             {
@@ -157,17 +170,19 @@ namespace SavePDF
 
             #region Setup the Command Manager
             iCmdMgr = iSwApp.GetCommandManager(cookie);
-            AddCommandMgr();
+            this.AddCommandMgr();
             #endregion
 
             #region Setup the Event Handlers
-            SwEventPtr = (SolidWorks.Interop.sldworks.SldWorks)iSwApp;
+            SwEventPtr = (SldWorks)iSwApp;
             openDocs = new Hashtable();
             AttachEventHandlers();
             #endregion
 
-            #region Setup Sample Property Manager
-            // AddPMP();
+            this.ReadOptions();
+
+            #region Setup Property Manager
+            this.AddPMP();
             #endregion
 
             return true;
@@ -179,9 +194,9 @@ namespace SavePDF
             RemovePMP();
             DetachEventHandlers();
 
-            System.Runtime.InteropServices.Marshal.ReleaseComObject(iCmdMgr);
+            Marshal.ReleaseComObject(iCmdMgr);
             iCmdMgr = null;
-            System.Runtime.InteropServices.Marshal.ReleaseComObject(iSwApp);
+            Marshal.ReleaseComObject(iSwApp);
             iSwApp = null;
             //The addin _must_ call GC.Collect() here in order to retrieve all managed code pointers 
             GC.Collect();
@@ -199,18 +214,18 @@ namespace SavePDF
         {
             ICommandGroup cmdGroup;
             if (iBmp == null)
+            {
                 iBmp = new BitmapHandler();
-            Assembly thisAssembly;
-            int cmdIndex0, cmdIndex1;
+            }
             string Title = "Save PDF", ToolTip = "Save PDF";
 
+            int[] docTypes =
+                {
+                    (int)swDocumentTypes_e.swDocASSEMBLY, (int)swDocumentTypes_e.swDocDRAWING,
+                    (int)swDocumentTypes_e.swDocPART
+                };
 
-            int[] docTypes = new int[]{(int)swDocumentTypes_e.swDocASSEMBLY,
-                                       (int)swDocumentTypes_e.swDocDRAWING,
-                                       (int)swDocumentTypes_e.swDocPART};
-
-            thisAssembly = Assembly.GetAssembly(this.GetType());
-
+            Assembly thisAssembly = Assembly.GetAssembly(this.GetType());
 
             int cmdGroupErr = 0;
             bool ignorePrevious = false;
@@ -219,7 +234,7 @@ namespace SavePDF
             //get the ID information stored in the registry
             bool getDataResult = iCmdMgr.GetGroupDataFromRegistry(MainCmdGroupID, out registryIDs);
 
-            int[] knownIDs = new int[2] { MainItemID1, MainItemID2 };
+            int[] knownIDs = { MainItemID1 };
 
             if (getDataResult)
             {
@@ -229,32 +244,34 @@ namespace SavePDF
                 }
             }
 
-            cmdGroup = iCmdMgr.CreateCommandGroup2(MainCmdGroupID, Title, ToolTip, "", -1, ignorePrevious, ref cmdGroupErr);
+            cmdGroup = iCmdMgr.CreateCommandGroup2(
+                MainCmdGroupID,
+                Title,
+                ToolTip,
+                "",
+                -1,
+                ignorePrevious,
+                ref cmdGroupErr);
             cmdGroup.LargeIconList = iBmp.CreateFileFromResourceBitmap("SavePDF.ToolbarLarge.bmp", thisAssembly);
             cmdGroup.SmallIconList = iBmp.CreateFileFromResourceBitmap("SavePDF.ToolbarSmall.bmp", thisAssembly);
             cmdGroup.LargeMainIcon = iBmp.CreateFileFromResourceBitmap("SavePDF.MainIconLarge.bmp", thisAssembly);
             cmdGroup.SmallMainIcon = iBmp.CreateFileFromResourceBitmap("SavePDF.MainIconSmall.bmp", thisAssembly);
 
             int menuToolbarOption = (int)(swCommandItemType_e.swMenuItem | swCommandItemType_e.swToolbarItem);
-            cmdIndex0 = cmdGroup.AddCommandItem2("CreateCube", -1, "Create a cube", "Create cube", 0, "CreateCube", "", MainItemID1, menuToolbarOption);
-            cmdIndex1 = cmdGroup.AddCommandItem2("Show PMP", -1, "Display sample property manager", "Show PMP", 2, "ShowPMP", "EnablePMP", MainItemID2, menuToolbarOption);
+            int cmdIndex0 = cmdGroup.AddCommandItem2(
+                "Save PDF",
+                -1,
+                "Save PDF Options",
+                "Save PDF",
+                2,
+                "ShowPMP",
+                "EnablePMP",
+                MainItemID1,
+                menuToolbarOption);
 
             cmdGroup.HasToolbar = true;
             cmdGroup.HasMenu = true;
             cmdGroup.Activate();
-
-            bool bResult;
-
-
-
-            FlyoutGroup flyGroup = iCmdMgr.CreateFlyoutGroup(FlyoutGroupID, "Dynamic Flyout", "Flyout Tooltip", "Flyout Hint",
-              cmdGroup.SmallMainIcon, cmdGroup.LargeMainIcon, cmdGroup.SmallIconList, cmdGroup.LargeIconList, "FlyoutCallback", "FlyoutEnable");
-
-
-            flyGroup.AddCommandItem("FlyoutCommand 1", "test", 0, "FlyoutCommandItem1", "FlyoutEnableCommandItem1");
-
-            flyGroup.FlyoutType = (int)swCommandFlyoutStyle_e.swCommandFlyoutStyle_Simple;
-
 
             foreach (int type in docTypes)
             {
@@ -262,7 +279,7 @@ namespace SavePDF
 
                 cmdTab = iCmdMgr.GetCommandTab(type, Title);
 
-                if (cmdTab != null & !getDataResult | ignorePrevious)//if tab exists, but we have ignored the registry info (or changed command group ID), re-create the tab.  Otherwise the ids won't matchup and the tab will be blank
+                if (cmdTab != null & !getDataResult | ignorePrevious) //if tab exists, but we have ignored the registry info (or changed command group ID), re-create the tab.  Otherwise the ids won't matchup and the tab will be blank
                 {
                     bool res = iCmdMgr.RemoveCommandTab(cmdTab);
                     cmdTab = null;
@@ -275,38 +292,15 @@ namespace SavePDF
 
                     CommandTabBox cmdBox = cmdTab.AddCommandTabBox();
 
-                    int[] cmdIDs = new int[3];
-                    int[] TextType = new int[3];
+                    int[] cmdIDs = new int[1];
+                    int[] textType = new int[1];
 
-                    cmdIDs[0] = cmdGroup.get_CommandID(cmdIndex0);
+                    cmdIDs[0] = cmdGroup.CommandID[cmdIndex0];
 
-                    TextType[0] = (int)swCommandTabButtonTextDisplay_e.swCommandTabButton_TextHorizontal;
+                    textType[0] = (int)swCommandTabButtonTextDisplay_e.swCommandTabButton_TextHorizontal;
 
-                    cmdIDs[1] = cmdGroup.get_CommandID(cmdIndex1);
-
-                    TextType[1] = (int)swCommandTabButtonTextDisplay_e.swCommandTabButton_TextHorizontal;
-
-                    cmdIDs[2] = cmdGroup.ToolbarId;
-
-                    TextType[2] = (int)swCommandTabButtonTextDisplay_e.swCommandTabButton_TextHorizontal | (int)swCommandTabButtonFlyoutStyle_e.swCommandTabButton_ActionFlyout;
-
-                    bResult = cmdBox.AddCommands(cmdIDs, TextType);
-
-
-
-                    CommandTabBox cmdBox1 = cmdTab.AddCommandTabBox();
-                    cmdIDs = new int[1];
-                    TextType = new int[1];
-
-                    cmdIDs[0] = flyGroup.CmdID;
-                    TextType[0] = (int)swCommandTabButtonTextDisplay_e.swCommandTabButton_TextBelow | (int)swCommandTabButtonFlyoutStyle_e.swCommandTabButton_ActionFlyout;
-
-                    bResult = cmdBox1.AddCommands(cmdIDs, TextType);
-
-                    cmdTab.AddSeparator(cmdBox1, cmdIDs[0]);
-
+                    cmdBox.AddCommands(cmdIDs, textType);
                 }
-
             }
             thisAssembly = null;
         }
@@ -316,7 +310,44 @@ namespace SavePDF
             iBmp.Dispose();
 
             iCmdMgr.RemoveCommandGroup(MainCmdGroupID);
-            iCmdMgr.RemoveFlyoutGroup(FlyoutGroupID);
+        }
+
+        public void ReadOptions()
+        {
+            try
+            {
+                RegistryKey hkcu = Registry.CurrentUser;
+                RegistryKey optionsKey = hkcu.OpenSubKey(OptionsKeyName, true) ?? hkcu.CreateSubKey(OptionsKeyName);
+
+                this.PDFLocation = (string)optionsKey.GetValue(LocationValueName, Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
+                this.AppendRevision = Convert.ToBoolean(optionsKey.GetValue(RevisionValueName, true));
+                this.AppendDescription = Convert.ToBoolean(optionsKey.GetValue(DescriptionValueName, true));
+                this.ShowPDF = Convert.ToBoolean(optionsKey.GetValue(ShowPDFValueName, false));
+            }
+            catch (Exception nl)
+            {
+                System.Windows.Forms.MessageBox.Show("There was a problem reading the options: \n\"" + nl.Message + "\"");
+            }
+        }
+
+        public void WriteOptions()
+        {
+            try
+            {
+                RegistryKey hkcu = Registry.CurrentUser;
+
+                RegistryKey optionsKey = hkcu.OpenSubKey(OptionsKeyName, true) ?? hkcu.CreateSubKey(OptionsKeyName);
+
+                optionsKey.SetValue(LocationValueName, this.PDFLocation, RegistryValueKind.String);
+                optionsKey.SetValue(RevisionValueName, this.AppendRevision, RegistryValueKind.DWord);
+                optionsKey.SetValue(DescriptionValueName, this.AppendDescription, RegistryValueKind.DWord);
+                optionsKey.SetValue(ShowPDFValueName, this.ShowPDF, RegistryValueKind.DWord);
+            }
+            catch (Exception nl)
+            {
+                System.Windows.Forms.MessageBox.Show(
+                    "There was a problem writing the options: \n\"" + nl.Message + "\"");
+            }
         }
 
         public bool CompareIDs(int[] storedIDs, int[] addinIDs)
@@ -375,28 +406,6 @@ namespace SavePDF
                 return 0;
         }
 
-        public void FlyoutCallback()
-        {
-            FlyoutGroup flyGroup = iCmdMgr.GetFlyoutGroup(FlyoutGroupID);
-            flyGroup.RemoveAllCommandItems();
-
-            flyGroup.AddCommandItem(System.DateTime.Now.ToLongTimeString(), "test", 0, "FlyoutCommandItem1", "FlyoutEnableCommandItem1");
-
-        }
-        public int FlyoutEnable()
-        {
-            return 1;
-        }
-
-        public void FlyoutCommandItem1()
-        {
-            iSwApp.SendMsgToUser("Flyout command 1");
-        }
-
-        public int FlyoutEnableCommandItem1()
-        {
-            return 1;
-        }
         #endregion
 
         #region Event Methods

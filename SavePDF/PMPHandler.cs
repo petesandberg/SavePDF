@@ -4,11 +4,17 @@ using SolidWorks.Interop.swpublished;
 
 namespace SavePDF
 {
+    using SolidWorks.Interop.swconst;
 
     public class PMPHandler : IPropertyManagerPage2Handler9
     {
         ISldWorks iSwApp;
         SwAddin userAddin;
+
+        private string pdfLocation;
+        private bool appendRevision;
+        private bool appendDescription;
+        private bool showPDF;
 
         public PMPHandler(SwAddin addin)
         {
@@ -28,7 +34,18 @@ namespace SavePDF
 
         public void OnCheckboxCheck(int id, bool status)
         {
-
+            switch (id)
+            {
+                case UserPMPage.DescriptionCheckboxId:
+                    this.userAddin.AppendDescription = status;
+                    break;
+                case UserPMPage.RevisionCheckboxId:
+                    this.userAddin.AppendRevision = status;
+                    break;
+                case UserPMPage.ShowCheckboxId:
+                    this.userAddin.ShowPDF = status;
+                    break;
+            }
         }
 
         public void OnClose(int reason)
@@ -38,6 +55,14 @@ namespace SavePDF
             int IndentSize;
             IndentSize = System.Diagnostics.Debug.IndentSize;
             System.Diagnostics.Debug.WriteLine(IndentSize);
+            if (reason == (int)swPropertyManagerPageCloseReasons_e.swPropertyManagerPageClose_Cancel)
+            {
+                this.userAddin.ReadOptions();
+            }
+            else if (reason == (int)swPropertyManagerPageCloseReasons_e.swPropertyManagerPageClose_Okay)
+            {
+                this.userAddin.WriteOptions();
+            }
         }
 
         public void OnComboboxEditChanged(int id, string text)
@@ -62,7 +87,6 @@ namespace SavePDF
 
         public void OnGroupCheck(int id, bool status)
         {
-
         }
 
         public void OnGroupExpand(int id, bool status)
@@ -127,7 +151,10 @@ namespace SavePDF
 
         public void OnTextboxChanged(int id, string text)
         {
-
+            if (id == UserPMPage.LocationTextboxId)
+            {
+                this.userAddin.PDFLocation = text;
+            }
         }
 
         public void AfterActivation()

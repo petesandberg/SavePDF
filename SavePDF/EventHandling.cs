@@ -6,7 +6,6 @@ using SolidWorks.Interop.swconst;
 namespace SavePDF
 {
     using System.Runtime.InteropServices;
-    using System.Xml;
 
     using Environment = System.Environment;
 
@@ -300,44 +299,25 @@ namespace SavePDF
                 string resolverdRevision;
                 CustomPropertyManager swCustProp = swModExt.CustomPropertyManager[string.Empty];
 
-                string optionLocation = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\Airgas\\SavePDF\\SavePDFOptions.xml";
-
-                XmlDocument xmlOptionsReader = new XmlDocument();
-
-                xmlOptionsReader.Load(optionLocation);
-
                 swCustProp.Get5("Description", false, out description, out resolvedDescription, out wasResolved);
                 swCustProp.Get5("Revision", false, out revision, out resolverdRevision, out wasResolved);
 
 
                 string pdffilename = FileName.ToUpper().Replace(".SLDDRW", string.Empty);
                 
-                XmlElement savePDF = xmlOptionsReader["SavePDF"];
-
-                if (savePDF != null)
+                if (this.userAddin.AppendDescription)
                 {
-                    XmlElement useDescription = savePDF["UseDescription"];
-                    if (!(useDescription == null || useDescription.InnerText.ToUpper() == "FALSE"))
-                    {
-                        pdffilename += ", " + description;
+                    pdffilename += ", " + description;
                        
-                    }
-
-                    XmlElement useRevision = savePDF["UseRevision"];
-
-                    if (!(useRevision == null || useRevision.InnerText.ToUpper() == "FALSE"))
-                    {
-                        pdffilename += ", Rev. " + revision;
-                    }
-
-                    XmlElement pdfPath = savePDF["PdfFolder"];
-
-                    if (pdfPath != null)
-                    {
-                        pdffilename = pdffilename.Substring(pdffilename.LastIndexOf('\\'));
-                        pdffilename = pdfPath.InnerText + pdffilename;
-                    }
                 }
+
+                if (this.userAddin.AppendRevision)
+                {
+                    pdffilename += ", Rev. " + revision;
+                }
+
+                pdffilename = pdffilename.Substring(pdffilename.LastIndexOf('\\'));
+                pdffilename = this.userAddin.PDFLocation + pdffilename;
                 pdffilename = pdffilename + ".pdf";
 
                 obj = this.doc.GetSheetNames();
@@ -361,15 +341,10 @@ namespace SavePDF
                 }
 
                 // Save the drawings sheets to a PDF file 
-                boolstatus = swExportPDFData.SetSheets((int)swExportDataSheetsToExport_e.swExportData_ExportSpecifiedSheets, (arrObjIn));
-                XmlElement viewAfter = savePDF["ShowPDF"];
+                swExportPDFData.SetSheets((int)swExportDataSheetsToExport_e.swExportData_ExportSpecifiedSheets, arrObjIn);
+                swExportPDFData.ViewPdfAfterSaving = this.userAddin.ShowPDF;
 
-                if (!(viewAfter == null || viewAfter.InnerText.ToUpper() == "FALSE"))
-                {
-                    swExportPDFData.ViewPdfAfterSaving = true;
-                } 
-
-                boolstatus = swModExt.SaveAs(pdffilename, (int)swSaveAsVersion_e.swSaveAsCurrentVersion, (int)swSaveAsOptions_e.swSaveAsOptions_Silent, swExportPDFData, ref errors, ref warnings);
+                swModExt.SaveAs(pdffilename, (int)swSaveAsVersion_e.swSaveAsCurrentVersion, (int)swSaveAsOptions_e.swSaveAsOptions_Silent, swExportPDFData, ref errors, ref warnings);
             }
             catch (Exception e)
             {

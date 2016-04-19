@@ -1,37 +1,61 @@
-using System;
-using SolidWorks.Interop.sldworks;
-using SolidWorks.Interop.swpublished;
+// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="PMPHandler.cs" company="Airgas">
+//   Airgas Inc. 2016
+// </copyright>
+// <summary>
+//   Defines the PMPHandler type.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace SavePDF
 {
+    using SolidWorks.Interop.sldworks;
     using SolidWorks.Interop.swconst;
+    using SolidWorks.Interop.swpublished;
 
+    /// <summary>
+    /// The pmp handler.
+    /// </summary>
     public class PMPHandler : IPropertyManagerPage2Handler9
     {
-        ISldWorks iSwApp;
-        SwAddin userAddin;
+        /// <summary>
+        /// The user addin.
+        /// </summary>
+        private readonly SwAddin userAddin;
 
-        private string pdfLocation;
-        private bool appendRevision;
-        private bool appendDescription;
-        private bool showPDF;
+        /// <summary>
+        /// The SolidWorks App.
+        /// </summary>
+        private ISldWorks solidworksApp;
 
         public PMPHandler(SwAddin addin)
         {
-            userAddin = addin;
-            iSwApp = (ISldWorks)userAddin.SwApp;
+            this.userAddin = addin;
+            this.solidworksApp = this.userAddin.SwApp;
         }
 
-        //Implement these methods from the interface
+        // Implement these methods from the interface
+        
+        /// <summary>
+        /// After the page closes.
+        /// </summary>
         public void AfterClose()
         {
-            //This function must contain code, even if it does nothing, to prevent the
-            //.NET runtime environment from doing garbage collection at the wrong time.
-            int IndentSize;
-            IndentSize = System.Diagnostics.Debug.IndentSize;
-            System.Diagnostics.Debug.WriteLine(IndentSize);
+            // This function must contain code, even if it does nothing, to prevent the
+            // .NET runtime environment from doing garbage collection at the wrong time.
+            int indentSize = System.Diagnostics.Debug.IndentSize;
+            System.Diagnostics.Debug.WriteLine(indentSize);
         }
 
+        /// <summary>
+        /// The on checkbox check.
+        /// </summary>
+        /// <param name="id">
+        /// The id of the checkbox that was checked.
+        /// </param>
+        /// <param name="status">
+        /// The new value of the checkbox.
+        /// </param>
         public void OnCheckboxCheck(int id, bool status)
         {
             switch (id)
@@ -48,26 +72,48 @@ namespace SavePDF
             }
         }
 
+        /// <summary>
+        /// The on textbox changed.
+        /// </summary>
+        /// <param name="id">
+        /// The id.
+        /// </param>
+        /// <param name="text">
+        /// The text.
+        /// </param>
+        public void OnTextboxChanged(int id, string text)
+        {
+            if (id == UserPMPage.LocationTextboxId)
+            {
+                this.userAddin.PDFLocation = text;
+            }
+        }
+
+        /// <summary>
+        /// Before the page closes.
+        /// </summary>
+        /// <param name="reason">
+        /// The reason for closure.
+        /// </param>
         public void OnClose(int reason)
         {
-            //This function must contain code, even if it does nothing, to prevent the
-            //.NET runtime environment from doing garbage collection at the wrong time.
-            int IndentSize;
-            IndentSize = System.Diagnostics.Debug.IndentSize;
-            System.Diagnostics.Debug.WriteLine(IndentSize);
-            if (reason == (int)swPropertyManagerPageCloseReasons_e.swPropertyManagerPageClose_Cancel)
+            // This function must contain code, even if it does nothing, to prevent the
+            // .NET runtime environment from doing garbage collection at the wrong time.
+            switch (reason)
             {
-                this.userAddin.ReadOptions();
-            }
-            else if (reason == (int)swPropertyManagerPageCloseReasons_e.swPropertyManagerPageClose_Okay)
-            {
-                this.userAddin.WriteOptions();
+                case (int)swPropertyManagerPageCloseReasons_e.swPropertyManagerPageClose_Okay:
+                    this.userAddin.WriteOptions();
+                    break;
+
+                // case (int)swPropertyManagerPageCloseReasons_e.swPropertyManagerPageClose_Cancel:
+                default:
+                    this.userAddin.ReadOptions();
+                    break;
             }
         }
 
         public void OnComboboxEditChanged(int id, string text)
         {
-
         }
 
         public int OnActiveXControlCreated(int id, bool status)
@@ -147,14 +193,6 @@ namespace SavePDF
         public void OnSelectionboxListChanged(int id, int item)
         {
 
-        }
-
-        public void OnTextboxChanged(int id, string text)
-        {
-            if (id == UserPMPage.LocationTextboxId)
-            {
-                this.userAddin.PDFLocation = text;
-            }
         }
 
         public void AfterActivation()
@@ -237,7 +275,5 @@ namespace SavePDF
         {
             return 0;
         }
-
-
     }
 }

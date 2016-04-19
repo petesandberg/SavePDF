@@ -6,6 +6,7 @@ using SolidWorks.Interop.swconst;
 namespace SavePDF
 {
     using System.Runtime.InteropServices;
+    using System.Security.Principal;
 
     using Environment = System.Environment;
 
@@ -348,7 +349,7 @@ namespace SavePDF
             }
             catch (Exception e)
             {
-
+                System.Windows.Forms.MessageBox.Show("Problem Saving the PDF. " + e.Message);
             }
 
             return 0;

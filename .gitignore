@@ -11,3 +11,4 @@ Express
 TestResult.xml
 *.VisualState.xml
 *.vsmdi
+*.TMP

@@ -9,6 +9,9 @@
 
 namespace SavePDF
 {
+    using System.IO;
+    using System.Windows.Forms;
+
     using SolidWorks.Interop.sldworks;
     using SolidWorks.Interop.swconst;
     using SolidWorks.Interop.swpublished;

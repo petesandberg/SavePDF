@@ -165,11 +165,6 @@
   <ItemGroup>
     <None Include="SavePDF.snk" />
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="SavePDFOptions.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>

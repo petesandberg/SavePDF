@@ -117,6 +117,7 @@
     </Reference>
     <Reference Include="SolidWorksTools">
       <HintPath>..\..\..\..\..\..\PROGRA~1\SOLIDW~1\SOLIDW~4\\SolidWorksTools.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System">
       <Name>System</Name>

@@ -305,17 +305,18 @@ namespace SavePDF
 
 
                 string pdffilename = FileName.ToUpper().Replace(".SLDDRW", string.Empty);
-                
+
+                if (this.userAddin.AppendRevision)
+                {
+                    pdffilename += ", Rev. " + revision;
+                }
+              
                 if (this.userAddin.AppendDescription)
                 {
                     pdffilename += ", " + description;
                        
                 }
 
-                if (this.userAddin.AppendRevision)
-                {
-                    pdffilename += ", Rev. " + revision;
-                }
 
                 pdffilename = pdffilename.Substring(pdffilename.LastIndexOf('\\'));
                 pdffilename = this.userAddin.PDFLocation + pdffilename;

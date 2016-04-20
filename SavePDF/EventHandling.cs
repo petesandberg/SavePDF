@@ -1,29 +1,27 @@
-using System;
-using System.Collections;
-using SolidWorks.Interop.sldworks;
-using SolidWorks.Interop.swconst;
-
 namespace SavePDF
 {
+    using System;
+    using System.Collections;
     using System.Runtime.InteropServices;
-    using System.Security.Principal;
-
-    using Environment = System.Environment;
+    using SolidWorks.Interop.sldworks;
+    using SolidWorks.Interop.swconst;
 
     public class DocumentEventHandler
     {
-        protected ISldWorks iSwApp;
-        protected ModelDoc2 document;
-        protected SwAddin userAddin;
+        protected ISldWorks SolidworksApp { get; set; }
 
-        protected Hashtable openModelViews;
+        protected ModelDoc2 ModelDocument { get; set; }
+        
+        protected SwAddin UserAddin { get; set; }
+
+        protected Hashtable OpenModelViews { get; set; }
 
         public DocumentEventHandler(ModelDoc2 modDoc, SwAddin addin)
         {
-            document = modDoc;
-            userAddin = addin;
-            iSwApp = (ISldWorks)userAddin.SwApp;
-            openModelViews = new Hashtable();
+            ModelDocument = modDoc;
+            UserAddin = addin;
+            SolidworksApp = (ISldWorks)UserAddin.SwApp;
+            OpenModelViews = new Hashtable();
         }
 
         virtual public bool AttachEventHandlers()
@@ -39,15 +37,15 @@ namespace SavePDF
         public bool ConnectModelViews()
         {
             IModelView mView;
-            mView = (IModelView)document.GetFirstModelView();
+            mView = (IModelView)ModelDocument.GetFirstModelView();
 
             while (mView != null)
             {
-                if (!openModelViews.Contains(mView))
+                if (!OpenModelViews.Contains(mView))
                 {
-                    DocView dView = new DocView(userAddin, mView, this);
+                    DocView dView = new DocView(UserAddin, mView, this);
                     dView.AttachEventHandlers();
-                    openModelViews.Add(mView, dView);
+                    OpenModelViews.Add(mView, dView);
                 }
                 mView = (IModelView)mView.GetNext();
             }
@@ -59,7 +57,7 @@ namespace SavePDF
             //Close events on all currently open docs
             DocView dView;
             int numKeys;
-            numKeys = openModelViews.Count;
+            numKeys = OpenModelViews.Count;
 
             if (numKeys == 0)
             {
@@ -69,13 +67,13 @@ namespace SavePDF
 
             object[] keys = new object[numKeys];
 
-            //Remove all ModelView event handlers
-            openModelViews.Keys.CopyTo(keys, 0);
+            // Remove all ModelView event handlers
+            OpenModelViews.Keys.CopyTo(keys, 0);
             foreach (ModelView key in keys)
             {
-                dView = (DocView)openModelViews[key];
+                dView = (DocView)OpenModelViews[key];
                 dView.DetachEventHandlers();
-                openModelViews.Remove(key);
+                OpenModelViews.Remove(key);
                 dView = null;
             }
             return true;
@@ -84,10 +82,10 @@ namespace SavePDF
         public bool DetachModelViewEventHandler(ModelView mView)
         {
             DocView dView;
-            if (openModelViews.Contains(mView))
+            if (OpenModelViews.Contains(mView))
             {
-                dView = (DocView)openModelViews[mView];
-                openModelViews.Remove(mView);
+                dView = (DocView)OpenModelViews[mView];
+                OpenModelViews.Remove(mView);
                 mView = null;
                 dView = null;
             }
@@ -102,7 +100,7 @@ namespace SavePDF
         public PartEventHandler(ModelDoc2 modDoc, SwAddin addin)
             : base(modDoc, addin)
         {
-            doc = (PartDoc)document;
+            doc = (PartDoc)ModelDocument;
         }
 
         override public bool AttachEventHandlers()
@@ -122,7 +120,7 @@ namespace SavePDF
 
             DisconnectModelViews();
 
-            userAddin.DetachModelEventHandler(document);
+            UserAddin.DetachModelEventHandler(ModelDocument);
             return true;
         }
 
@@ -147,7 +145,7 @@ namespace SavePDF
         public AssemblyEventHandler(ModelDoc2 modDoc, SwAddin addin)
             : base(modDoc, addin)
         {
-            doc = (AssemblyDoc)document;
+            doc = (AssemblyDoc)ModelDocument;
             swAddin = addin;
         }
 
@@ -174,7 +172,7 @@ namespace SavePDF
             doc.ComponentDisplayStateChangeNotify -= new DAssemblyDocEvents_ComponentDisplayStateChangeNotifyEventHandler(ComponentDisplayStateChangeNotify);
             DisconnectModelViews();
 
-            userAddin.DetachModelEventHandler(document);
+            UserAddin.DetachModelEventHandler(ModelDocument);
             return true;
         }
 
@@ -267,7 +265,7 @@ namespace SavePDF
         public DrawingEventHandler(ModelDoc2 modDoc, SwAddin addin)
             : base(modDoc, addin)
         {
-            doc = (DrawingDoc)document;
+            doc = (DrawingDoc)ModelDocument;
         }
 
         override public bool AttachEventHandlers()
@@ -285,8 +283,8 @@ namespace SavePDF
         {
             try
             {
-                ModelDocExtension swModExt = this.document.Extension;
-                ExportPdfData swExportPDFData = (ExportPdfData)this.iSwApp.GetExportFileData((int)swExportDataFileType_e.swExportPdfData);
+                ModelDocExtension swModExt = this.ModelDocument.Extension;
+                ExportPdfData swExportPDFData = (ExportPdfData)this.SolidworksApp.GetExportFileData((int)swExportDataFileType_e.swExportPdfData);
                 Sheet swSheet;
                 bool boolstatus = false;
                 int errors = 0;
@@ -311,7 +309,7 @@ namespace SavePDF
                     pdffilename += ", Rev. " + revision;
                 }
               
-                if (this.userAddin.AppendDescription)
+                if (this.UserAddin.AppendDescription)
                 {
                     pdffilename += ", " + description;
                        
@@ -319,7 +317,7 @@ namespace SavePDF
 
 
                 pdffilename = pdffilename.Substring(pdffilename.LastIndexOf('\\'));
-                pdffilename = this.userAddin.PDFLocation + pdffilename;
+                pdffilename = this.UserAddin.PDFLocation + pdffilename;
                 pdffilename = pdffilename + ".pdf";
 
                 obj = this.doc.GetSheetNames();
@@ -344,7 +342,7 @@ namespace SavePDF
 
                 // Save the drawings sheets to a PDF file 
                 swExportPDFData.SetSheets((int)swExportDataSheetsToExport_e.swExportData_ExportSpecifiedSheets, arrObjIn);
-                swExportPDFData.ViewPdfAfterSaving = this.userAddin.ShowPDF;
+                swExportPDFData.ViewPdfAfterSaving = this.UserAddin.ShowPDF;
 
                 swModExt.SaveAs(pdffilename, (int)swSaveAsVersion_e.swSaveAsCurrentVersion, (int)swSaveAsOptions_e.swSaveAsOptions_Silent, swExportPDFData, ref errors, ref warnings);
             }
@@ -365,7 +363,7 @@ namespace SavePDF
 
             DisconnectModelViews();
 
-            userAddin.DetachModelEventHandler(document);
+            UserAddin.DetachModelEventHandler(ModelDocument);
             return true;
         }
 

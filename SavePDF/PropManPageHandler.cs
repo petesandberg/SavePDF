@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="PMPHandler.cs" company="Airgas">
+// <copyright file="PropManPageHandler.cs" company="Airgas">
 //   Airgas Inc. 2016
 // </copyright>
 // <summary>
@@ -9,32 +9,25 @@
 
 namespace SavePDF
 {
-    using System.IO;
-    using System.Windows.Forms;
-
-    using SolidWorks.Interop.sldworks;
     using SolidWorks.Interop.swconst;
     using SolidWorks.Interop.swpublished;
 
     /// <summary>
-    /// The pmp handler.
+    /// The Property Manager Page handler.
     /// </summary>
-    public class PMPHandler : IPropertyManagerPage2Handler9
+    public class PropManPageHandler : IPropertyManagerPage2Handler9
     {
         /// <summary>
         /// The user addin.
         /// </summary>
         private readonly SwAddin userAddin;
 
-        /// <summary>
-        /// The SolidWorks App.
-        /// </summary>
-        private ISldWorks solidworksApp;
+        //// private ISldWorks solidworksApp;
 
-        public PMPHandler(SwAddin addin)
+        public PropManPageHandler(SwAddin addin)
         {
             this.userAddin = addin;
-            this.solidworksApp = this.userAddin.SwApp;
+            //// this.solidworksApp = this.userAddin.SwApp;
         }
 
         // Implement these methods from the interface
@@ -46,6 +39,7 @@ namespace SavePDF
         {
             // This function must contain code, even if it does nothing, to prevent the
             // .NET runtime environment from doing garbage collection at the wrong time.
+            // ReSharper disable once RedundantAssignment
             int indentSize = System.Diagnostics.Debug.IndentSize;
             System.Diagnostics.Debug.WriteLine(indentSize);
         }
@@ -126,12 +120,10 @@ namespace SavePDF
 
         public void OnButtonPress(int id)
         {
-
         }
 
         public void OnComboboxSelectionChanged(int id, int item)
         {
-
         }
 
         public void OnGroupCheck(int id, bool status)
@@ -140,7 +132,6 @@ namespace SavePDF
 
         public void OnGroupExpand(int id, bool status)
         {
-
         }
 
         public bool OnHelp()
@@ -150,7 +141,6 @@ namespace SavePDF
 
         public void OnListboxSelectionChanged(int id, int item)
         {
-
         }
 
         public bool OnNextPage()
@@ -160,17 +150,14 @@ namespace SavePDF
 
         public void OnNumberboxChanged(int id, double val)
         {
-
         }
 
         public void OnNumberBoxTrackingCompleted(int id, double val)
         {
-
         }
 
         public void OnOptionCheck(int id)
         {
-
         }
 
         public bool OnPreviousPage()
@@ -180,42 +167,35 @@ namespace SavePDF
 
         public void OnSelectionboxCalloutCreated(int id)
         {
-
         }
 
         public void OnSelectionboxCalloutDestroyed(int id)
         {
-
         }
 
         public void OnSelectionboxFocusChanged(int id)
         {
-
         }
 
         public void OnSelectionboxListChanged(int id, int item)
         {
-
         }
 
         public void AfterActivation()
         {
-
         }
 
-        public bool OnKeystroke(int Wparam, int Message, int Lparam, int Id)
+        public bool OnKeystroke(int wparam, int message, int lparam, int id)
         {
             return true;
         }
 
-        public void OnPopupMenuItem(int Id)
+        public void OnPopupMenuItem(int id)
         {
-
         }
 
-        public void OnPopupMenuItemUpdate(int Id, ref int retval)
+        public void OnPopupMenuItemUpdate(int id, ref int retval)
         {
-
         }
 
         public bool OnPreview()
@@ -223,58 +203,49 @@ namespace SavePDF
             return true;
         }
 
-        public void OnSliderPositionChanged(int Id, double Value)
+        public void OnSliderPositionChanged(int id, double value)
         {
-
         }
 
-        public void OnSliderTrackingCompleted(int Id, double Value)
+        public void OnSliderTrackingCompleted(int id, double value)
         {
-
         }
 
-        public bool OnSubmitSelection(int Id, object Selection, int SelType, ref string ItemText)
+        public bool OnSubmitSelection(int id, object selection, int selType, ref string itemText)
         {
             return true;
         }
 
-        public bool OnTabClicked(int Id)
+        public bool OnTabClicked(int id)
         {
             return true;
         }
 
         public void OnUndo()
         {
-
         }
 
         public void OnWhatsNew()
         {
-
         }
 
-
-        public void OnGainedFocus(int Id)
+        public void OnGainedFocus(int id)
         {
-
         }
 
-        public void OnListboxRMBUp(int Id, int PosX, int PosY)
+        public void OnListboxRMBUp(int id, int posX, int posY)
         {
-
         }
 
-        public void OnLostFocus(int Id)
+        public void OnLostFocus(int id)
         {
-
         }
 
         public void OnRedo()
         {
-
         }
 
-        public int OnWindowFromHandleControlCreated(int Id, bool Status)
+        public int OnWindowFromHandleControlCreated(int id, bool status)
         {
             return 0;
         }

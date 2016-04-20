@@ -13,7 +13,7 @@ namespace SavePDF
     {
         // Local Objects
         private IPropertyManagerPage2 swPropertyPage;
-        private PMPHandler handler;
+        private PropManPageHandler handler;
         private readonly ISldWorks iSwApp;
         private readonly SwAddin userAddin;
 
@@ -57,7 +57,7 @@ namespace SavePDF
             const int Options = (int)swPropertyManagerPageOptions_e.swPropertyManagerOptions_OkayButton |
                                 (int)swPropertyManagerPageOptions_e.swPropertyManagerOptions_CancelButton;
 
-            this.handler = new PMPHandler(this.userAddin);
+            this.handler = new PropManPageHandler(this.userAddin);
             this.swPropertyPage = (IPropertyManagerPage2)iSwApp.CreatePropertyManagerPage("Save PDF", Options, this.handler, ref errors);
             if (this.swPropertyPage != null && errors == (int)swPropertyManagerPageStatus_e.swPropertyManagerPage_Okay)
             {

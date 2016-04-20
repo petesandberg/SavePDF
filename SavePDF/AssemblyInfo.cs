@@ -1,12 +1,19 @@
+// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="AssemblyInfo.cs" company="Airgas Inc">
+//   Airgas Inc. 2016
+// </copyright>
+// <summary>
+//   AssemblyInfo.cs
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
+
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-//
-// General Information about an assembly is controlled through the following 
+/* General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
-// associated with an assembly.
-//
+// associated with an assembly. */
+
 [assembly: AssemblyTitle("SavePDF")]
 [assembly: AssemblyDescription("Saves PDF copy of a drawing")]
 [assembly: AssemblyConfiguration("")]
@@ -16,21 +23,19 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTrademark("Airgas Inc")]
 [assembly: AssemblyCulture("")]
 
-//
-// Version information for an assembly consists of the following four values:
+/* Version information for an assembly consists of the following four values:
 //
 //      Major Version
 //      Minor Version 
 //      Build Number
-//      Revision
+//      Revision 
 //
 // You can specify all the values or you can default the Revision and Build Numbers 
-// by using the '*' as shown below:
+// by using the '*' as shown below: */
 
 [assembly: AssemblyVersion("1.1.0")]
 
-//
-// In order to sign your assembly you must specify a key to use. Refer to the 
+/* In order to sign your assembly you must specify a key to use. Refer to the 
 // Microsoft .NET Framework documentation for more information on assembly signing.
 //
 // Use the attributes below to control which key is used for signing. 
@@ -53,7 +58,7 @@ using System.Runtime.InteropServices;
 //       attribute as [assembly: AssemblyKeyFile("..\\..\\mykey.snk")]
 //   (*) Delay Signing is an advanced option - see the Microsoft .NET Framework
 //       documentation for more information on this.
-//
+*/
 [assembly: AssemblyDelaySign(false)]
 [assembly: AssemblyKeyName("")]
 [assembly: GuidAttribute("F3A62241-265D-42A6-B6F5-3EFFBD341DE2")]

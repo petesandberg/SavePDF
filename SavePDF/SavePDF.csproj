@@ -129,7 +129,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="EventHandling.cs" />
-    <Compile Include="PMPHandler.cs" />
+    <Compile Include="PropManPageHandler.cs" />
     <Compile Include="SwAddin.cs">
       <SubType>Code</SubType>
       <ExcludeFromStyleCop>True</ExcludeFromStyleCop>

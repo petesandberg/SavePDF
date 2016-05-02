@@ -34,6 +34,7 @@ namespace SavePDF
         public const int RevisionCheckboxId = 2;
         public const int DescriptionCheckboxId = 3;
         public const int ShowCheckboxId = 4;
+        public const int OnCloseCheckboxId = 5;
         #endregion
 
         public UserPMPage(SwAddin addin)
@@ -96,7 +97,7 @@ namespace SavePDF
             options = (int)swAddControlOptions_e.swControlOptions_Enabled |
                       (int)swAddControlOptions_e.swControlOptions_Visible;
 
-            this.LocationTextbox = (IPropertyManagerPageTextbox)SavePDFGroup.AddControl(LocationTextboxId, controlType, "PDF Location", align, options, "The File location where the PDFs will be saved to.");
+            this.LocationTextbox = (IPropertyManagerPageTextbox)this.SavePDFGroup.AddControl(LocationTextboxId, controlType, "PDF Location", align, options, "The File location where the PDFs will be saved to.");
 
             // Rev Checkbox
             controlType = (int)swPropertyManagerPageControlType_e.swControlType_Checkbox;
@@ -104,7 +105,7 @@ namespace SavePDF
             options = (int)swAddControlOptions_e.swControlOptions_Enabled |
                       (int)swAddControlOptions_e.swControlOptions_Visible;
 
-            this.revisionCheckbox = (IPropertyManagerPageCheckbox)SavePDFGroup.AddControl(RevisionCheckboxId, controlType, "Append Revision", align, options, "Append the Revision to the filename");
+            this.revisionCheckbox = (IPropertyManagerPageCheckbox)this.SavePDFGroup.AddControl(RevisionCheckboxId, controlType, "Append Revision", align, options, "Append the Revision to the filename");
             
             // Description Checkbox
             controlType = (int)swPropertyManagerPageControlType_e.swControlType_Checkbox;
@@ -112,7 +113,7 @@ namespace SavePDF
             options = (int)swAddControlOptions_e.swControlOptions_Enabled |
                       (int)swAddControlOptions_e.swControlOptions_Visible;
 
-            this.descriptionCheckbox = (IPropertyManagerPageCheckbox)SavePDFGroup.AddControl(DescriptionCheckboxId, controlType, "Append Description", align, options, "Append the Description to the filename");
+            this.descriptionCheckbox = (IPropertyManagerPageCheckbox)this.SavePDFGroup.AddControl(DescriptionCheckboxId, controlType, "Append Description", align, options, "Append the Description to the filename");
 
             // Show Checkbox
             controlType = (int)swPropertyManagerPageControlType_e.swControlType_Checkbox;
@@ -121,6 +122,14 @@ namespace SavePDF
                       (int)swAddControlOptions_e.swControlOptions_Visible;
 
             this.showCheckbox = (IPropertyManagerPageCheckbox)SavePDFGroup.AddControl(ShowCheckboxId, controlType, "Show PDF", align, options, "Show the PDF after saving");
+ 
+            // On Close Checkbox
+            controlType = (int)swPropertyManagerPageControlType_e.swControlType_Checkbox;
+            align = (int)swPropertyManagerPageControlLeftAlign_e.swControlAlign_LeftEdge;
+            options = (int)swAddControlOptions_e.swControlOptions_Enabled |
+                      (int)swAddControlOptions_e.swControlOptions_Visible;
+
+            this.showCheckbox = (IPropertyManagerPageCheckbox)this.SavePDFGroup.AddControl(OnCloseCheckboxId, controlType, "Save on Close", align, options, "Save the PDF on close");
         }
 
         public void Show()

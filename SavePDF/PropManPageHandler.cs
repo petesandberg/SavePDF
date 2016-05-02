@@ -66,6 +66,9 @@ namespace SavePDF
                 case UserPMPage.ShowCheckboxId:
                     this.userAddin.ShowPDF = status;
                     break;
+                case UserPMPage.OnCloseCheckboxId:
+                    this.userAddin.SaveOnClose = status;
+                    break;
             }
         }
 

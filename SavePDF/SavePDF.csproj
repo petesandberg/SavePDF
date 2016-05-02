@@ -125,10 +125,14 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AssemblyEventHandler.cs" />
     <Compile Include="AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="EventHandling.cs" />
+    <Compile Include="DocumentEventHandler.cs" />
+    <Compile Include="DocView.cs" />
+    <Compile Include="DrawingEventHandler.cs" />
+    <Compile Include="PartEventHandler.cs" />
     <Compile Include="PropManPageHandler.cs" />
     <Compile Include="SwAddin.cs">
       <SubType>Code</SubType>

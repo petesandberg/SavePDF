@@ -75,6 +75,11 @@ namespace SavePDF
         /// </summary>
         private const string ShowPdfValueName = "ShowPDF";
 
+        /// <summary>
+        /// The save on close value name.
+        /// </summary>
+        private const string SaveOnCloseValueName = "SaveOnClose";
+
         #endregion
 
         #region Fields
@@ -150,6 +155,8 @@ namespace SavePDF
         /// Gets the sw app.
         /// </summary>
         public ISldWorks SwApp { get; private set; }
+
+        public bool SaveOnClose { get; set; }
 
         #endregion
 
@@ -608,6 +615,7 @@ namespace SavePDF
         }
 
         // Events
+        
         /// <summary>
         /// The on doc change.
         /// </summary>
@@ -686,6 +694,7 @@ namespace SavePDF
                 this.AppendRevision = Convert.ToBoolean(optionsKey.GetValue(RevisionValueName, true));
                 this.AppendDescription = Convert.ToBoolean(optionsKey.GetValue(DescriptionValueName, true));
                 this.ShowPDF = Convert.ToBoolean(optionsKey.GetValue(ShowPdfValueName, false));
+                this.SaveOnClose  = Convert.ToBoolean(optionsKey.GetValue(SaveOnCloseValueName, false));
             }
             catch (Exception nl)
             {
@@ -741,6 +750,7 @@ namespace SavePDF
                 optionsKey.SetValue(RevisionValueName, this.AppendRevision, RegistryValueKind.DWord);
                 optionsKey.SetValue(DescriptionValueName, this.AppendDescription, RegistryValueKind.DWord);
                 optionsKey.SetValue(ShowPdfValueName, this.ShowPDF, RegistryValueKind.DWord);
+                optionsKey.SetValue(SaveOnCloseValueName, this.SaveOnClose, RegistryValueKind.DWord);
             }
             catch (Exception nl)
             {

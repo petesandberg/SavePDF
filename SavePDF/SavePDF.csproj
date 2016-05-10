@@ -174,8 +174,7 @@
   <PropertyGroup>
     <PreBuildEvent>
     </PreBuildEvent>
-    <PostBuildEvent>
-IF EXIST "$(TargetDir)$(TargetName).bmp" (GOTO REGISTRATION)
+    <PostBuildEvent>IF EXIST "$(TargetDir)$(TargetName).bmp" (GOTO REGISTRATION)
 XCOPY "$(ProjectDir)AddinIcon.bmp" "$(TargetDir)"  /F
 REN "$(TargetDir)AddinIcon.bmp" "$(TargetName).bmp" 
 

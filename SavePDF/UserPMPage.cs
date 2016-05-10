@@ -26,6 +26,7 @@ namespace SavePDF
         IPropertyManagerPageCheckbox revisionCheckbox;
         IPropertyManagerPageCheckbox descriptionCheckbox;
         IPropertyManagerPageCheckbox showCheckbox;
+        IPropertyManagerPageCheckbox ocCloseCheckbox;
 
         //Control IDs
         public const int group1ID = 0;
@@ -129,7 +130,7 @@ namespace SavePDF
             options = (int)swAddControlOptions_e.swControlOptions_Enabled |
                       (int)swAddControlOptions_e.swControlOptions_Visible;
 
-            this.showCheckbox = (IPropertyManagerPageCheckbox)this.SavePDFGroup.AddControl(OnCloseCheckboxId, controlType, "Save on Close", align, options, "Save the PDF on close");
+            this.ocCloseCheckbox = (IPropertyManagerPageCheckbox)this.SavePDFGroup.AddControl(OnCloseCheckboxId, controlType, "Save on Close", align, options, "Save the PDF on close");
         }
 
         public void Show()
@@ -140,6 +141,7 @@ namespace SavePDF
                 this.revisionCheckbox.Checked = this.userAddin.AppendRevision;
                 this.descriptionCheckbox.Checked = this.userAddin.AppendDescription;
                 this.showCheckbox.Checked = this.userAddin.ShowPDF;
+                this.ocCloseCheckbox.Checked = this.userAddin.SaveOnClose;
                 this.swPropertyPage.Show();
             }
         }

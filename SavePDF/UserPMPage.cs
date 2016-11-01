@@ -26,7 +26,7 @@ namespace SavePDF
         IPropertyManagerPageCheckbox revisionCheckbox;
         IPropertyManagerPageCheckbox descriptionCheckbox;
         IPropertyManagerPageCheckbox showCheckbox;
-        IPropertyManagerPageCheckbox ocCloseCheckbox;
+        //IPropertyManagerPageCheckbox ocCloseCheckbox;
 
         //Control IDs
         public const int group1ID = 0;
@@ -35,7 +35,7 @@ namespace SavePDF
         public const int RevisionCheckboxId = 2;
         public const int DescriptionCheckboxId = 3;
         public const int ShowCheckboxId = 4;
-        public const int OnCloseCheckboxId = 5;
+        //public const int OnCloseCheckboxId = 5;
         #endregion
 
         public UserPMPage(SwAddin addin)
@@ -125,12 +125,12 @@ namespace SavePDF
             this.showCheckbox = (IPropertyManagerPageCheckbox)SavePDFGroup.AddControl(ShowCheckboxId, controlType, "Show PDF", align, options, "Show the PDF after saving");
  
             // On Close Checkbox
-            controlType = (int)swPropertyManagerPageControlType_e.swControlType_Checkbox;
-            align = (int)swPropertyManagerPageControlLeftAlign_e.swControlAlign_LeftEdge;
-            options = (int)swAddControlOptions_e.swControlOptions_Enabled |
-                      (int)swAddControlOptions_e.swControlOptions_Visible;
+            //controlType = (int)swPropertyManagerPageControlType_e.swControlType_Checkbox;
+            //align = (int)swPropertyManagerPageControlLeftAlign_e.swControlAlign_LeftEdge;
+            //options = (int)swAddControlOptions_e.swControlOptions_Enabled |
+            //          (int)swAddControlOptions_e.swControlOptions_Visible;
 
-            this.ocCloseCheckbox = (IPropertyManagerPageCheckbox)this.SavePDFGroup.AddControl(OnCloseCheckboxId, controlType, "Save on Close", align, options, "Save the PDF on close");
+            //this.ocCloseCheckbox = (IPropertyManagerPageCheckbox)this.SavePDFGroup.AddControl(OnCloseCheckboxId, controlType, "Save on Close", align, options, "Save the PDF on close");
         }
 
         public void Show()
@@ -141,7 +141,7 @@ namespace SavePDF
                 this.revisionCheckbox.Checked = this.userAddin.AppendRevision;
                 this.descriptionCheckbox.Checked = this.userAddin.AppendDescription;
                 this.showCheckbox.Checked = this.userAddin.ShowPDF;
-                this.ocCloseCheckbox.Checked = this.userAddin.SaveOnClose;
+                //this.ocCloseCheckbox.Checked = this.userAddin.SaveOnClose;
                 this.swPropertyPage.Show();
             }
         }

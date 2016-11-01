@@ -7,6 +7,8 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
+using System.Windows.Forms.VisualStyles;
+
 namespace SavePDF
 {
     using System;
@@ -694,7 +696,8 @@ namespace SavePDF
                 this.AppendRevision = Convert.ToBoolean(optionsKey.GetValue(RevisionValueName, true));
                 this.AppendDescription = Convert.ToBoolean(optionsKey.GetValue(DescriptionValueName, true));
                 this.ShowPDF = Convert.ToBoolean(optionsKey.GetValue(ShowPdfValueName, false));
-                this.SaveOnClose  = Convert.ToBoolean(optionsKey.GetValue(SaveOnCloseValueName, false));
+                //this.SaveOnClose = Convert.ToBoolean(optionsKey.GetValue(SaveOnCloseValueName, false));
+                this.SaveOnClose = true;
             }
             catch (Exception nl)
             {

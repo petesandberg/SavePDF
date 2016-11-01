@@ -23,7 +23,7 @@ namespace SavePDF
             this.doc.DestroyNotify += new DDrawingDocEvents_DestroyNotifyEventHandler(this.OnDestroy);
             this.doc.NewSelectionNotify += new DDrawingDocEvents_NewSelectionNotifyEventHandler(this.OnNewSelection);
            
-            this.doc.FileSaveNotify += new DDrawingDocEvents_FileSaveNotifyEventHandler(this.doc_FileSaveNotify);
+            //this.doc.FileSaveNotify += new DDrawingDocEvents_FileSaveNotifyEventHandler(this.doc_FileSaveNotify);
 
             this.doc.DestroyNotify2  += new DDrawingDocEvents_DestroyNotify2EventHandler(this.doc_FileCloseNotify);
             ConnectModelViews();
@@ -92,7 +92,7 @@ namespace SavePDF
                 }
 
                 // Save the drawings sheets to a PDF file 
-                swExportPDFData.SetSheets((int)swExportDataSheetsToExport_e.swExportData_ExportSpecifiedSheets, arrObjIn);
+                swExportPDFData.SetSheets((int)swExportDataSheetsToExport_e.swExportData_ExportAllSheets, arrObjIn);
                 swExportPDFData.ViewPdfAfterSaving = this.UserAddin.ShowPDF;
 
                 swModExt.SaveAs(pdffilename, (int)swSaveAsVersion_e.swSaveAsCurrentVersion, (int)swSaveAsOptions_e.swSaveAsOptions_Silent, swExportPDFData, ref errors, ref warnings);
@@ -114,7 +114,10 @@ namespace SavePDF
         {
             if ((reason == (int)swDestroyNotifyType_e.swDestroyNotifyDestroy) && this.UserAddin.SaveOnClose)
             {
-                return this.SavePDFCopy(((ModelDoc2)this.doc).GetPathName());
+                if (!string.IsNullOrWhiteSpace(((ModelDoc2)this.doc).GetPathName())) 
+                {
+                    return this.SavePDFCopy(((ModelDoc2)this.doc).GetPathName());
+                }
             }
             return 0;
         }
@@ -124,7 +127,7 @@ namespace SavePDF
             doc.DestroyNotify -= new DDrawingDocEvents_DestroyNotifyEventHandler(OnDestroy);
             doc.NewSelectionNotify -= new DDrawingDocEvents_NewSelectionNotifyEventHandler(OnNewSelection);
 
-            doc.FileSaveNotify -= new DDrawingDocEvents_FileSaveNotifyEventHandler(this.doc_FileSaveNotify);
+            //doc.FileSaveNotify -= new DDrawingDocEvents_FileSaveNotifyEventHandler(this.doc_FileSaveNotify);
 
             DisconnectModelViews();
 

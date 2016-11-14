@@ -26,6 +26,7 @@ namespace SavePDF
         IPropertyManagerPageCheckbox revisionCheckbox;
         IPropertyManagerPageCheckbox descriptionCheckbox;
         IPropertyManagerPageCheckbox showCheckbox;
+        IPropertyManagerPageCheckbox removePrevCheckbox;
         //IPropertyManagerPageCheckbox ocCloseCheckbox;
 
         //Control IDs
@@ -35,6 +36,7 @@ namespace SavePDF
         public const int RevisionCheckboxId = 2;
         public const int DescriptionCheckboxId = 3;
         public const int ShowCheckboxId = 4;
+        public const int RemovePreviousCheckboxId = 5;
         //public const int OnCloseCheckboxId = 5;
         #endregion
 
@@ -123,7 +125,15 @@ namespace SavePDF
                       (int)swAddControlOptions_e.swControlOptions_Visible;
 
             this.showCheckbox = (IPropertyManagerPageCheckbox)SavePDFGroup.AddControl(ShowCheckboxId, controlType, "Show PDF", align, options, "Show the PDF after saving");
- 
+
+            // Remove Previous Checkbox
+            controlType = (int)swPropertyManagerPageControlType_e.swControlType_Checkbox;
+            align = (int)swPropertyManagerPageControlLeftAlign_e.swControlAlign_LeftEdge;
+            options = (int)swAddControlOptions_e.swControlOptions_Enabled |
+                      (int)swAddControlOptions_e.swControlOptions_Visible;
+
+            this.removePrevCheckbox = (IPropertyManagerPageCheckbox)SavePDFGroup.AddControl(RemovePreviousCheckboxId, controlType, "Remove Previous", align, options, "Remove the Previous versions of the pdf");
+
             // On Close Checkbox
             //controlType = (int)swPropertyManagerPageControlType_e.swControlType_Checkbox;
             //align = (int)swPropertyManagerPageControlLeftAlign_e.swControlAlign_LeftEdge;
@@ -141,6 +151,7 @@ namespace SavePDF
                 this.revisionCheckbox.Checked = this.userAddin.AppendRevision;
                 this.descriptionCheckbox.Checked = this.userAddin.AppendDescription;
                 this.showCheckbox.Checked = this.userAddin.ShowPDF;
+                this.removePrevCheckbox.Checked = this.userAddin.ShowPDF;
                 //this.ocCloseCheckbox.Checked = this.userAddin.SaveOnClose;
                 this.swPropertyPage.Show();
             }

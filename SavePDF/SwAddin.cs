@@ -78,6 +78,11 @@ namespace SavePDF
         private const string ShowPdfValueName = "ShowPDF";
 
         /// <summary>
+        /// The show pdf value name.
+        /// </summary>
+        private const string RemovePrevValueName = "RemovePrevious";
+
+        /// <summary>
         /// The save on close value name.
         /// </summary>
         private const string SaveOnCloseValueName = "SaveOnClose";
@@ -160,6 +165,7 @@ namespace SavePDF
 
         public bool SaveOnClose { get; set; }
 
+        public bool RemovePrevious { get; set; }
         #endregion
 
         #region Public Methods and Operators
@@ -696,6 +702,7 @@ namespace SavePDF
                 this.AppendRevision = Convert.ToBoolean(optionsKey.GetValue(RevisionValueName, true));
                 this.AppendDescription = Convert.ToBoolean(optionsKey.GetValue(DescriptionValueName, true));
                 this.ShowPDF = Convert.ToBoolean(optionsKey.GetValue(ShowPdfValueName, false));
+                this.RemovePrevious = Convert.ToBoolean(optionsKey.GetValue(RemovePrevValueName, false));
                 //this.SaveOnClose = Convert.ToBoolean(optionsKey.GetValue(SaveOnCloseValueName, false));
                 this.SaveOnClose = true;
             }
@@ -754,6 +761,7 @@ namespace SavePDF
                 optionsKey.SetValue(DescriptionValueName, this.AppendDescription, RegistryValueKind.DWord);
                 optionsKey.SetValue(ShowPdfValueName, this.ShowPDF, RegistryValueKind.DWord);
                 optionsKey.SetValue(SaveOnCloseValueName, this.SaveOnClose, RegistryValueKind.DWord);
+                optionsKey.SetValue(RemovePrevValueName, this.RemovePrevious, RegistryValueKind.DWord);
             }
             catch (Exception nl)
             {

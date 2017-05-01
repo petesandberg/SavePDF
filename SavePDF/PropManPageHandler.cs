@@ -67,7 +67,7 @@ namespace SavePDF
                     this.userAddin.ShowPDF = status;
                     break;
                 case UserPMPage.RemovePreviousCheckboxId:
-                    this.userAddin.ShowPDF = status;
+                    this.userAddin.RemovePrevious = status;
                     break;
                     //case UserPMPage.OnCloseCheckboxId:
                     //    this.userAddin.SaveOnClose = status;

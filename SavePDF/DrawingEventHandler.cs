@@ -55,11 +55,11 @@ namespace SavePDF
                 swCustProp.Get5("Revision", false, out revision, out resolverdRevision, out wasResolved);
 
 
-                string previousNames;
-
                 string pdffilename = fileName.ToUpper().Replace(".SLDDRW", string.Empty);
-                previousNames = pdffilename = pdffilename.Substring(pdffilename.LastIndexOf('\\'));
-                pdffilename = this.UserAddin.PDFLocation + pdffilename;
+
+                string previousNames = pdffilename.Substring(pdffilename.LastIndexOf('\\') + 1);
+                pdffilename = pdffilename.Substring(pdffilename.LastIndexOf('\\'));
+                 
 
                 if (this.UserAddin.AppendRevision)
                 {
@@ -72,10 +72,22 @@ namespace SavePDF
 
                 }
 
+                string useDirectory;
+                // find project sub-directory
+                var subDir = new DirectoryInfo(this.UserAddin.PDFLocation + "\\" + previousNames.Substring(0, 2));
+                if (subDir.Exists)
+                {
+                    useDirectory = this.UserAddin.PDFLocation + "\\" + previousNames.Substring(0, 2);
+                }
+                else
+                {
+                    useDirectory = this.UserAddin.PDFLocation;
+                }
+
                 //Delete the old versions
                 if (this.UserAddin.RemovePrevious)
                 {
-                    var dir = new DirectoryInfo(this.UserAddin.PDFLocation);
+                    var dir = new DirectoryInfo(useDirectory);
 
                     foreach (var file in dir.EnumerateFiles(previousNames + "*.pdf"))
                     {
@@ -83,7 +95,7 @@ namespace SavePDF
                     }
                 }
 
-                pdffilename = pdffilename + ".pdf";
+                pdffilename = useDirectory + pdffilename + ".pdf";
 
                 obj = this.doc.GetSheetNames();
                 int count = 0;
